@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  python:
+    build: .
+    container_name: pyxel_python
+    volumes:
+      - .:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /mnt/wslg:/mnt/wslg:rw
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+      - PULSE_SERVER=/mnt/wslg/PulseServer
+      - SDL_VIDEODRIVER=x11
+      - SDL_AUDIODRIVER=pulse
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - MESA_GL_VERSION_OVERRIDE=3.3
+      - MESA_GLSL_VERSION_OVERRIDE=330
+    network_mode: host
+    command: python
