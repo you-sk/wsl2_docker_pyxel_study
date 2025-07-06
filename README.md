@@ -1,6 +1,9 @@
 # Pyxel on WSL2 with Docker
 
 WSL2環境でPyxelゲームエンジンを動作させるためのDockerプロジェクトです。グラフィックと音声の両方に対応しています。
+WSL2上にdockerがインストールされている前提です。
+windows版Docker Desktopによる動作は確認していません。
+サンプルプログラムの実行まで動作確認していますが、すべての環境での動作を保証するものではありません。
 
 ## 特徴
 
@@ -15,15 +18,15 @@ WSL2環境でPyxelゲームエンジンを動作させるためのDockerプロ�
 - Windows 10/11 with WSL2
 - WSLg（音声出力用）
   - `wsl --version`でWSLgバージョンが表示されることを確認
-- Docker Desktop for Windows または WSL2内のDocker
+- WSL2内のDocker
 - X11サーバー（WSLgに含まれる）
 
 ## セットアップ
 
 1. **リポジトリのクローン**
    ```bash
-   git clone <repository-url>
-   cd pyxel_study
+   git clone https://github.com/you-sk/wsl2_docker_pyxel_study.git
+   cd wsl2_docker_pyxel_study
    ```
 
 2. **Dockerコンテナのビルドと起動**
@@ -39,7 +42,8 @@ WSL2環境でPyxelゲームエンジンを動作させるためのDockerプロ�
 # サンプルプログラムをコピー
 docker-compose exec python pyxel copy_examples
 
-# サンプルアプリケーションを実行
+# サンプルアプリケーションの実行例
+（サンプルプログラムのコピー後）
 docker-compose exec python python pyxel_examples/01_hello_pyxel.py
 docker-compose exec python python pyxel_examples/02_jump_game.py
 docker-compose exec python python pyxel_examples/03_draw_api.py
