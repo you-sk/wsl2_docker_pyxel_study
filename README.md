@@ -1,118 +1,143 @@
-# Python Docker環境
+# Pyxel on WSL2 with Docker
 
-このプロジェクトは、DockerコンテナでPythonを実行するための環境です。
+WSL2環境でPyxelゲームエンジンを動作させるためのDockerプロジェクトです。グラフィックと音声の両方に対応しています。
+
+## 特徴
+
+- 🎮 WSL2環境でPyxelアプリケーションを実行
+- 🖼️ X11によるグラフィック表示対応
+- 🔊 WSLgによる音声出力対応（Windows側への追加インストール不要）
+- 🐳 Docker環境で依存関係を管理
+- 📦 すぐに使えるサンプルコード付き
+
+## 必要な環境
+
+- Windows 10/11 with WSL2
+- WSLg（音声出力用）
+  - `wsl --version`でWSLgバージョンが表示されることを確認
+- Docker Desktop for Windows または WSL2内のDocker
+- X11サーバー（WSLgに含まれる）
 
 ## セットアップ
 
-### 必要なもの
-- Docker
-- Docker Compose
+1. **リポジトリのクローン**
+   ```bash
+   git clone <repository-url>
+   cd pyxel_study
+   ```
 
-### ビルドと起動
-
-```bash
-# コンテナのビルドと起動
-docker-compose up -d --build
-
-# コンテナの停止
-docker-compose down
-```
+2. **Dockerコンテナのビルドと起動**
+   ```bash
+   docker-compose up -d --build
+   ```
 
 ## 使い方
 
-### Pythonインタラクティブシェル
-```bash
-docker-compose exec python python
-```
-
-### Pythonスクリプトの実行
-```bash
-docker-compose exec python python ファイル名.py
-```
-
-## サンプルプログラム
-
-### 1. hello.py
-基本的な動作確認用プログラム
-- Pythonバージョンの表示
-- 簡単な計算処理
-- 文字列操作のデモ
+### Pyxelアプリケーションの実行
 
 ```bash
-docker-compose exec python python hello.py
+# サンプルプログラムをコピー
+docker-compose exec python pyxel copy_examples
+
+# サンプルアプリケーションを実行
+docker-compose exec python python pyxel_examples/01_hello_pyxel.py
+docker-compose exec python python pyxel_examples/02_jump_game.py
+docker-compose exec python python pyxel_examples/03_draw_api.py
 ```
 
-### 2. data_analysis.py
-データ分析のサンプル
-- 30日分のサンプルデータ（売上、訪問者数、気温）を生成
-- データの統計情報を計算（合計、平均、最大、最小）
-- 結果をJSONファイルに保存
+### Pyxelコマンドの使用
 
 ```bash
-docker-compose exec python python data_analysis.py
+# Pyxelアプリケーションを実行
+docker-compose exec python pyxel run your_app.py
+
+# ファイル変更を監視して自動再実行
+docker-compose exec python pyxel watch . your_app.py
+
+# Pyxelエディタを起動（リソースファイルの編集）
+docker-compose exec python pyxel edit
+
+# アプリケーションをパッケージ化
+docker-compose exec python pyxel package app_dir startup.py
+
+# .pyxappファイルを実行
+docker-compose exec python pyxel play your_app.pyxapp
 ```
 
-### 3. file_processor.py
-ファイル処理のサンプル
-- テキストファイルの単語数、行数、文字数をカウント
-- サンプルテキストファイルを自動生成
-- コマンドライン引数で複数ファイルの処理に対応
+### 独自のPyxelアプリケーション開発
+
+1. プロジェクトルートに新しいPythonファイルを作成
+2. Pyxelのインポートとアプリケーションコードを記述
+3. 以下のコマンドで実行：
+   ```bash
+   docker-compose exec python python your_app.py
+   ```
+
+### コンテナ内でインタラクティブシェルを使用
 
 ```bash
-# 基本的な使い方
-docker-compose exec python python file_processor.py
-
-# 複数ファイルを処理
-docker-compose exec python python file_processor.py file1.txt file2.txt
-```
-
-## ファイル構成
-
-```
-.
-├── Dockerfile           # Python環境の定義
-├── docker-compose.yml   # Docker Compose設定
-├── requirements.txt     # Pythonパッケージの依存関係
-├── .dockerignore       # Dockerビルド時の除外設定
-├── README.md           # このファイル
-├── hello.py            # サンプル: 基本動作確認
-├── data_analysis.py    # サンプル: データ分析
-└── file_processor.py   # サンプル: ファイル処理
-```
-
-## カスタマイズ
-
-### Pythonパッケージの追加
-`requirements.txt`に必要なパッケージを追加してください：
-
-```txt
-numpy==1.24.3
-pandas==2.0.3
-requests==2.31.0
-```
-
-追加後、コンテナを再ビルドしてください：
-```bash
-docker-compose up -d --build
-```
-
-### Pythonバージョンの変更
-`Dockerfile`の1行目を編集してバージョンを変更できます：
-```dockerfile
-FROM python:3.11-slim  # 3.11を他のバージョンに変更
+docker-compose exec python bash
 ```
 
 ## トラブルシューティング
 
-### コンテナが起動しない場合
-```bash
-# ログを確認
-docker-compose logs
+### グラフィックが表示されない場合
 
-# コンテナの状態を確認
-docker-compose ps
+1. `$DISPLAY`環境変数を確認：
+   ```bash
+   echo $DISPLAY
+   ```
+
+2. X11の接続をテスト：
+   ```bash
+   docker-compose exec python python test_display.py
+   ```
+
+### 音声が出力されない場合
+
+1. WSLgのバージョンを確認：
+   ```bash
+   wsl --version
+   ```
+
+2. 音声設定をテスト：
+   ```bash
+   docker-compose exec python python test_audio.py
+   ```
+
+3. 音声が不要な場合は、`docker-compose.yml`で`SDL_AUDIODRIVER=dummy`に設定
+
+### SDL2初期化エラーが発生する場合
+
+現在の設定はソフトウェアレンダリングを使用しています。これはWSL2環境での互換性を確保するためです。
+
+## プロジェクト構成
+
+```
+pyxel_study/
+├── docker-compose.yml      # Docker設定（WSLg対応）
+├── Dockerfile             # Pyxel実行環境の定義
+├── requirements.txt       # Pythonパッケージ
+├── test_display.py        # ディスプレイ設定テスト
+├── test_audio.py          # 音声設定テスト
+└── README.md             # このファイル
 ```
 
-### ファイルの変更が反映されない場合
-ボリュームマウントにより、ローカルの変更は自動的にコンテナ内に反映されます。
-Pythonパッケージを追加した場合のみ、再ビルドが必要です。
+## 技術詳細
+
+### 環境変数
+
+- `DISPLAY`: X11ディスプレイ設定
+- `PULSE_SERVER`: WSLgのPulseAudioサーバー
+- `SDL_VIDEODRIVER`: X11を使用
+- `SDL_AUDIODRIVER`: PulseAudioを使用
+- `LIBGL_ALWAYS_SOFTWARE`: ソフトウェアレンダリング有効化
+
+### マウントポイント
+
+- `/tmp/.X11-unix`: X11ソケット
+- `/mnt/wslg`: WSLgの共有ディレクトリ（音声用）
+
+## ライセンス
+
+MITライセンスで公開しています。
